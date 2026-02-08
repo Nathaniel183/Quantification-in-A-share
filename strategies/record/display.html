@@ -1,0 +1,441 @@
+<!-- display.html (带“持仓全屏”功能) -->
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>策略展示 - Strategy Viewer</title>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    /* 基础布局 */
+    :root{
+      --bg-white: #ffffff;
+      /* 更亮的莫兰迪偏红系（可替换为你喜欢的色值） */
+      --morandi-red-1: #c76f6e;
+      --morandi-red-2: #d49b98;
+      --morandi-red-3: #edd6d5;
+      --morandi-rose:  #f6ebe9;
+      --muted-gray:    #9b9b9b;
+      --soft-border:   #efecec;
+    }
+    *{box-sizing:border-box;font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial;}
+    body{
+      margin:0;
+      height:100vh;
+      background: var(--morandi-red-3);
+      color:#333;
+      display:flex;
+      align-items:stretch;
+      justify-content:center;
+      padding:24px;
+    }
+    .app{
+      width:1200px;
+      max-width:100%;
+      background:var(--bg-white);
+      border-radius:12px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+      overflow:hidden;
+      display:flex;
+      min-height:640px;
+    }
+
+    /* 侧边栏 */
+    .sidebar{
+      width:260px;
+      background:linear-gradient(180deg, rgba(199,111,110,0.06), rgba(212,152,152,0.04));
+      border-right:1px solid var(--soft-border);
+      padding:18px;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+    .brand{
+      font-weight:700;color:var(--morandi-red-1);font-size:18px;margin-bottom:6px;
+    }
+    .strategy-list{flex:1;overflow:auto;padding-right:6px;}
+    .strategy-item{
+      padding:10px 12px;border-radius:8px;margin-bottom:8px;cursor:pointer;
+      background:transparent;border:1px solid transparent;
+    }
+    .strategy-item:hover{ background:rgba(0,0,0,0.02); }
+    .strategy-item.active{
+      background:var(--morandi-rose);
+      border-color:var(--morandi-red-2);
+      box-shadow: inset 0 0 0 2px rgba(199,111,110,0.04);
+    }
+
+    /* 主区域 */
+    .main{
+      flex:1;padding:18px;display:flex;flex-direction:column;gap:12px;
+      /* 关键：允许子项在受限高度内正确收缩，从而使内部滚动生效 */
+      min-height: 0;
+      position: relative;
+    }
+    .top{
+      display:flex;gap:12px;
+    }
+    .readme{
+      width:45%;min-height:180px;padding:14px;border-radius:10px;border:1px solid var(--soft-border);
+      background:linear-gradient(180deg, rgba(255,255,255,1), rgba(249,249,249,1));
+      overflow:auto;
+    }
+    .chart-card{
+      flex:1;padding:10px;border-radius:10px;border:1px solid var(--soft-border);display:flex;flex-direction:column;
+      justify-content:center;
+    }
+    .chart-card canvas{ width:100% !important; height:240px !important; }
+
+    /* 下方表格 */
+    .bottom{
+      flex:1;
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      border-radius:10px;border:1px solid var(--soft-border);padding:12px;background:#fff;
+      min-height: 0;
+      transition: all 200ms ease;
+      z-index: 1;
+    }
+
+    /* 全屏时：隐藏 top，让 bottom 占满主区域 */
+    .main.expanded .top { display: none; }
+    .main.expanded .bottom {
+      /* 在 expanded 状态下，bottom 将填满 main 的空间 */
+      flex: 1 1 auto;
+      z-index: 5;
+    }
+
+    .controls{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+    .controls button{
+      padding:6px 10px;border-radius:6px;border:1px solid var(--soft-border);background:#fff;cursor:pointer;
+    }
+    .controls select{padding:6px 8px;border-radius:6px;border:1px solid var(--soft-border);}
+
+    /* 全屏按钮样式 */
+    .fullscreen-btn{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:6px 10px;
+      border-radius:6px;
+      border:1px solid var(--soft-border);
+      background: linear-gradient(180deg, rgba(255,255,255,1), rgba(248,246,246,1));
+      cursor:pointer;
+      font-size:13px;
+    }
+    .fullscreen-btn:active{ transform: translateY(1px); }
+
+    /* 使表格容器占据剩余空间并可滚动 */
+    #tableContainer{
+      overflow:auto;
+      flex:1;
+      min-height: 120px;
+    }
+
+    table{width:100%;border-collapse:collapse;}
+    th,td{padding:8px 10px;border-bottom:1px solid var(--soft-border);text-align:left;font-size:14px}
+    th{background:transparent;font-weight:600;color:var(--muted-gray)}
+    tr:hover td{background:rgba(0,0,0,0.02)}
+
+    .muted{color:var(--muted-gray);font-size:13px}
+    .pct { font-weight:600; color:var(--morandi-red-1) }
+    .empty{padding:40px;text-align:center;color:var(--muted-gray)}
+
+    /* 当在 narrow 屏幕时，expanded 也能工作 */
+    @media (max-width:1000px){
+      .app{flex-direction:column;width:96%;height:auto}
+      .sidebar{width:100%;display:flex;flex-direction:row;overflow:auto}
+      .main{padding:12px}
+      .top{flex-direction:column}
+      .readme{width:100%}
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="sidebar">
+      <div class="brand">策略列表</div>
+      <div id="strategyList" class="strategy-list">
+        <!-- 动态插入策略项 -->
+      </div>
+      <div class="muted" style="font-size:12px">由 display.py 提供后端接口</div>
+    </div>
+
+    <div id="mainArea" class="main">
+      <div class="top">
+        <div class="readme">
+          <div style="font-weight:700;margin-bottom:6px">策略说明</div>
+          <pre id="readmeText" style="white-space:pre-wrap;margin:0;font-family:inherit;color:#333">请选择左侧策略</pre>
+        </div>
+        <div class="chart-card">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+            <div style="font-weight:700">日期 - 总价值</div>
+            <div class="muted" id="chartHint">单位：比值</div>
+          </div>
+          <canvas id="incomeChart"></canvas>
+        </div>
+      </div>
+
+      <div class="bottom" id="bottomArea" aria-expanded="false">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div style="font-weight:700">持仓（按收益排序）</div>
+          <div class="muted">收益率以 % 显示，保留两位小数</div>
+        </div>
+
+        <div class="controls">
+          <button id="prevBtn">上一期</button>
+          <button id="nextBtn">下一期</button>
+          <select id="dateSelect"></select>
+
+          <!-- 全屏按钮 -->
+          <button id="fullscreenBtn" class="fullscreen-btn" aria-pressed="false" title="展开持仓区域至主区域">
+            全屏
+          </button>
+
+          <div style="flex:1"></div>
+          <div class="muted" id="currentDateLabel"></div>
+        </div>
+
+        <div id="tableContainer">
+          <div class="empty">请选择策略并等待数据加载</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+  const apiBase = "/api";
+  let strategies = [];
+  let currentStrategy = null;
+  let chart = null;
+  let dates = [];
+  let currentDateIndex = 0;
+
+  // 全屏控制相关
+  const mainArea = document.getElementById("mainArea");
+  const fullscreenBtn = null; // placeholder to satisfy linters; real btn is fetched later in init
+
+  async function fetchJSON(url){
+    const r = await fetch(url);
+    if (!r.ok){
+      console.error("fetch failed", url, r.statusText);
+      return null;
+    }
+    return await r.json();
+  }
+
+  async function loadStrategies(){
+    const data = await fetchJSON(`${apiBase}/strategies`);
+    strategies = (data && data.strategies) ? data.strategies : [];
+    const container = document.getElementById("strategyList");
+    container.innerHTML = "";
+    strategies.forEach(name => {
+      const el = document.createElement("div");
+      el.className = "strategy-item";
+      el.textContent = name;
+      el.onclick = () => selectStrategy(name, el);
+      container.appendChild(el);
+    });
+    if (strategies.length > 0){
+      // auto-select first
+      const first = container.querySelector(".strategy-item");
+      selectStrategy(strategies[0], first);
+    }
+  }
+
+  function setActiveSidebar(el){
+    document.querySelectorAll(".strategy-item").forEach(x => x.classList.remove("active"));
+    if (el) el.classList.add("active");
+  }
+
+  async function selectStrategy(name, el){
+    setActiveSidebar(el);
+    currentStrategy = name;
+    // readme
+    const txt = await fetchText(`${apiBase}/strategy/${encodeURIComponent(name)}/readme`);
+    document.getElementById("readmeText").textContent = txt || "(无说明)";
+    // income chart
+    const income = await fetchJSON(`${apiBase}/strategy/${encodeURIComponent(name)}/income`);
+    renderChart(income && income.income_series ? income.income_series : []);
+    // dates
+    const ddata = await fetchJSON(`${apiBase}/strategy/${encodeURIComponent(name)}/dates`);
+    dates = ddata && ddata.dates ? ddata.dates : [];
+    populateDateControls(dates);
+    // load positions for first (latest) date if exists
+    if (dates.length > 0){
+      currentDateIndex = 0; // dates were returned in descending order by backend
+      await loadPositionsForCurrentDate();
+    } else {
+      emptyTable("没有可用的持仓日期");
+    }
+  }
+
+  async function fetchText(url){
+    const r = await fetch(url);
+    if (!r.ok) return null;
+    return await r.text();
+  }
+
+  function renderChart(series){
+    const labels = series.map(s => s.date);
+    const data = series.map(s => s.income);
+    const ctx = document.getElementById("incomeChart").getContext("2d");
+    if (chart) {
+      chart.destroy();
+    }
+    chart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [{
+          label: '总价值 (比值)',
+          data,
+          tension: 0.2,
+          fill: false,
+          borderWidth: 2,
+          pointRadius: 3,
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: ctx => ` ${ctx.parsed.y}`
+            }
+          }
+        },
+        scales: {
+          x: { display: true, title: {display:false} },
+          y: { display: true, title: { display:false } }
+        }
+      }
+    });
+  }
+
+  function populateDateControls(datesArr){
+    const select = document.getElementById("dateSelect");
+    select.innerHTML = "";
+    datesArr.forEach((d, idx) => {
+      const opt = document.createElement("option");
+      opt.value = d;
+      opt.text = d;
+      select.appendChild(opt);
+    });
+    select.onchange = async function(){
+      const val = this.value;
+      currentDateIndex = datesArr.indexOf(val);
+      await loadPositionsForCurrentDate();
+    };
+    document.getElementById("prevBtn").onclick = async function(){
+      if (currentDateIndex < datesArr.length - 1){
+        currentDateIndex += 1;
+        select.selectedIndex = currentDateIndex;
+        await loadPositionsForCurrentDate();
+      }
+    };
+    document.getElementById("nextBtn").onclick = async function(){
+      if (currentDateIndex > 0){
+        currentDateIndex -= 1;
+        select.selectedIndex = currentDateIndex;
+        await loadPositionsForCurrentDate();
+      }
+    };
+    // set default selection to index 0 (latest)
+    if (datesArr.length > 0){
+      select.selectedIndex = 0;
+      currentDateIndex = 0;
+    }
+  }
+
+  async function loadPositionsForCurrentDate(){
+    if (!currentStrategy || dates.length === 0) return;
+    const date = dates[currentDateIndex];
+    document.getElementById("currentDateLabel").textContent = `查看日期： ${date}`;
+    const resp = await fetchJSON(`${apiBase}/strategy/${encodeURIComponent(currentStrategy)}/positions?date=${encodeURIComponent(date)}`);
+    if (!resp) {
+      emptyTable("加载持仓数据失败");
+      return;
+    }
+    renderTable(resp.columns, resp.rows);
+  }
+
+  function emptyTable(message){
+    const container = document.getElementById("tableContainer");
+    container.innerHTML = `<div class="empty">${message}</div>`;
+  }
+
+  function renderTable(cols, rows){
+    const container = document.getElementById("tableContainer");
+    if (!rows || rows.length === 0){
+      container.innerHTML = `<div class="empty">暂无持仓数据</div>`;
+      return;
+    }
+    // build table
+    let html = "<table><thead><tr>";
+    cols.forEach(c => html += `<th>${escapeHtml(c)}</th>`);
+    html += "</tr></thead><tbody>";
+    rows.forEach(r => {
+      html += "<tr>";
+      r.forEach((cell, i) => {
+        const colName = cols[i];
+        if (colName === "收益率"){
+          html += `<td class="pct">${cell === null ? "" : (Number(cell).toFixed(2) + "%")}</td>`;
+        } else {
+          html += `<td>${escapeHtml(cell === null ? "" : String(cell))}</td>`;
+        }
+      });
+      html += "</tr>";
+    });
+    html += "</tbody></table>";
+    container.innerHTML = html;
+  }
+
+  function escapeHtml(text){
+    if (!text) return "";
+    return text.replace(/[&<>"']/g, function(m){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[m]; });
+  }
+
+  // --- 初始化与全屏按钮处理 ---
+  function initFullscreenButton() {
+    const btn = document.getElementById("fullscreenBtn");
+    btn.addEventListener("click", () => {
+      const main = document.getElementById("mainArea");
+      const bottom = document.getElementById("bottomArea");
+      const isExpanded = main.classList.contains("expanded");
+      if (isExpanded) {
+        // 退出全屏
+        main.classList.remove("expanded");
+        bottom.setAttribute("aria-expanded", "false");
+        btn.setAttribute("aria-pressed", "false");
+        btn.textContent = "全屏";
+      } else {
+        // 进入全屏（仅扩展主区域内的持仓区）
+        main.classList.add("expanded");
+        bottom.setAttribute("aria-expanded", "true");
+        btn.setAttribute("aria-pressed", "true");
+        btn.textContent = "退出全屏";
+        // 把焦点放到表格容器以便用户可以用键盘滚动
+        setTimeout(() => { document.getElementById("tableContainer").focus?.(); }, 50);
+      }
+      // 在切换显示状态后，Chart.js 可能需要 resize，销毁/重建并非必须，这里尝试更新尺寸
+      if (chart && chart.resize) {
+        setTimeout(() => chart.resize(), 220);
+      }
+    });
+  }
+
+  // 初始化入口
+  (function init(){
+    initFullscreenButton();
+    loadStrategies();
+  })();
+</script>
+</body>
+</html>
