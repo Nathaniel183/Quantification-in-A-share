@@ -90,7 +90,7 @@ class StgPred(Strategy):
         super().__init__(cash, datas, save)
 
         # 设置策略名
-        self.strategy_name = "预测收益率"
+        self.strategy_name = "预测收益率策略"
         self.max_num = max_num
         self.weight:pd.DataFrame = pd.read_csv(wpath, index_col=(0, 1), dtype={'code':str, 'date':str})
         self.st = data_api.get_st_list()
