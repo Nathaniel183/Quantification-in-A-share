@@ -7,13 +7,13 @@ import factors
 from factors import factor_lab
 
 vals1 = [
-        # factors.Size(),
-        # factors.Value(),
-        factors.Turnover(),
-        # factors.Momentum(12,1),
-        factors.FScore(),
-        # factors.MScore(),
-        # factors.Industry(),
+    # factors.Size(),
+    # factors.Value(),
+    factors.Turnover(),
+    # factors.Momentum(12,1),
+    factors.FScore(),
+    # factors.MScore(),
+    # factors.Industry(),
 ]
 
 vals2 = [

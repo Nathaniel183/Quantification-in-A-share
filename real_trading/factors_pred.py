@@ -6,7 +6,7 @@ import data_api
 import factors
 
 date = '202602'
-# ret = pd.read_csv('./202601.csv', dtype={'股票代码':str})
+
 ret = pd.read_csv(factors.wpath('prediction'), dtype={'code':str, 'date':str}).rename(columns={'code':'股票代码'})
 ret = ret.loc[ret['date']==date].sort_values('prediction',ascending=False)
 
