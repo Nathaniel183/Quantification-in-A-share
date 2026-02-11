@@ -121,7 +121,7 @@ class Strategy(ABC):
         })
 
         # 记录总资产
-        self.asset_record = pd.DataFrame({'total':0},
+        self.asset_record = pd.DataFrame({'total':0.0},
                                          index=self.date_list)
         self.total = 0
         self.total_return = 0
@@ -290,7 +290,7 @@ class Strategy(ABC):
         """
         更新当前资产价值 -- 使用close计算
         """
-        fund = 0
+        fund = 0.0
         for code, row in self.position.iterrows():
             key = (self.date_cur, code)
             close_price = self.datas.loc[key, 'close'] if key in self.datas.index else 0

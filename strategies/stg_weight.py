@@ -145,8 +145,8 @@ class StgWeight(Strategy):
 if __name__ == '__main__':
     # 策略初始化
     strategy = StgWeight(cash=10000000,
-                         datas=data_api.get_monthly_qfq('20181201', '20260201'),
-                         wpath=factors.wpath('w1'), max_num=20, save=False)
+                         datas=data_api.get_monthly_qfq('20200201', '20260201'),
+                         wpath=factors.wpath('w1'), max_num=5, save=False)
 
     # 回测执行
     strategy.run()

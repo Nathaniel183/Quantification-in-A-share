@@ -36,6 +36,7 @@ def _get_industry_dummies() -> pd.DataFrame:
     # 5.将哑变量合并到原数据
     result = pd.concat([result['股票代码'], dummies], axis=1)
 
+    result = result.rename(columns={'股票代码': 'code'})
     return result
 
 def build_industry_dummies():

@@ -136,8 +136,8 @@ class StgPred(Strategy):
 if __name__ == '__main__':
     # 策略初始化
     strategy = StgPred(cash=10000000,
-                       datas=data_api.get_monthly_qfq('20161201', '20260201'),
-                       wpath=factors.wpath('prediction'), max_num=20, save=False)
+                       datas=data_api.get_monthly_qfq('20250201', '20260201'),
+                       wpath=factors.wpath('prediction1'), max_num=5, save=False)
 
     # 回测执行
     strategy.run()
