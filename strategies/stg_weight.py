@@ -93,7 +93,7 @@ class StgWeight(Strategy):
         self.strategy_name = "权重"
         self.max_num = max_num
         self.weight:pd.DataFrame = pd.read_csv(wpath, index_col=(0, 1), dtype={'code':str, 'date':str})
-        self.st = data_api.get_st_list()
+        self.stock_name = data_api.get_name()
 
     def next(self):
         """
@@ -109,7 +109,8 @@ class StgWeight(Strategy):
         ## 2.去除为0的和st的
         ret = ret[ret['w']!=0]
         ret = ret.reset_index(drop=False)
-        ret = ret[~ret['code'].isin(self.st)]
+        st = self.stock_name.loc[self.stock_name[self.date_cur].str.contains('ST', na=False) & self.stock_name[self.date_cur].notna(), '股票代码']
+        ret = ret[~ret['code'].isin(st)]
         ## 3.排序并截取（截取后重新归一化到和为1）
         ret = ret.sort_values(ascending=False, by='w')
         if len(ret) > self.max_num:

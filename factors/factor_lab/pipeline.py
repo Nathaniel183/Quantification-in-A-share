@@ -10,6 +10,7 @@ def revenue(vals:list[factors.Factor], period:int=12):
     date_list = df.index.get_level_values('date').unique().tolist()
     # 2.回归获得系数
     params = factor_lab.ols_regress(change, df)
+    if 'market' in df.columns: df = df.drop('market', axis=1)
     # 3.计算预计收益率
     result_list = []
     for d_i, date in enumerate(date_list[1:]):

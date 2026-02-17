@@ -93,7 +93,7 @@ class StgPred(Strategy):
         self.strategy_name = "预测收益率策略"
         self.max_num = max_num
         self.weight:pd.DataFrame = pd.read_csv(wpath, index_col=(0, 1), dtype={'code':str, 'date':str})
-        self.st = data_api.get_st_list()
+        self.stock_name = data_api.get_name()
 
     def next(self):
         """
@@ -105,7 +105,8 @@ class StgPred(Strategy):
         # 用策略计算出需要操作的标的代码
         ret = self.weight.xs(self.date_cur, level='date')
         ret = ret.sort_values(ascending=False, by='prediction').reset_index(drop=False)
-        ret = ret[~ret['code'].isin(self.st)]
+        st = self.stock_name.loc[self.stock_name[self.date_cur].str.contains('ST', na=False) & self.stock_name[self.date_cur].notna(), '股票代码']
+        ret = ret[~ret['code'].isin(st)]
         print(ret)
 
         # 清仓 或使用self.sell函数单笔卖出
@@ -136,7 +137,7 @@ class StgPred(Strategy):
 if __name__ == '__main__':
     # 策略初始化
     strategy = StgPred(cash=10000000,
-                       datas=data_api.get_monthly_qfq('20250201', '20260201'),
+                       datas=data_api.get_monthly_qfq('20240201', '20260201'),
                        wpath=factors.wpath('prediction1'), max_num=5, save=False)
 
     # 回测执行

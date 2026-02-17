@@ -7,6 +7,7 @@ data_path = current_file_path+"/../dataset/"
 
 stock_path = data_path + "股票列表.csv"
 index_path = data_path + "指数列表.csv"
+name_path = data_path + "name.csv"
 st_path = data_path + "退市股票列表.csv"
 
 def pv_monthly_hfq_path(code:str)->str:

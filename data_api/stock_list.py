@@ -45,10 +45,28 @@ def get_t_list():
     return datas['股票代码']
 
 
-if __name__ == '__main__':
-    data = get_stock_list().loc[0:1, '股票代码']
-    df = get_stock_list(data)
-    print(df)
+def get_name():
+    """
+    获取各月份时股票名称
+    :return: DataFrame(col=['code', 'date1', 'date2', ...])
+    """
+    datas = pd.read_csv(datapath.name_path, dtype=str)
+    datas['code'] = datas['code'].str.split('.').str[0]
+    datas = datas.rename(columns={'code':'股票代码'})
+    return datas
 
-    df = get_stock_list(data)[['股票代码', '股票名称', '地域', '所属行业']].rename(columns={'股票代码': 'code'})
-    print(df)
+
+if __name__ == '__main__':
+    pass
+    # data = get_stock_list().loc[0:1, '股票代码']
+    # df = get_stock_list(data)
+    # print(df)
+    #
+    # df = get_stock_list(data)[['股票代码', '股票名称', '地域', '所属行业']].rename(columns={'股票代码': 'code'})
+    # print(df)
+
+    # date_cur = '202601'
+    # datas = get_name()
+    # result = datas.loc[datas[date_cur].str.contains('ST', na=False) & datas[date_cur].notna(), '股票代码']
+    # print(datas)
+    # print(result)

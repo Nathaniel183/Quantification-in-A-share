@@ -6,8 +6,9 @@ import factors
 from factors import factor_lab
 
 vals1 = [
-    factors.Size(),
-    factors.Value(),
+    factors.Market(),
+    # factors.Size(),
+    # factors.Value(),
     factors.Turnover(),
     # factors.Momentum(12,1),
     factors.FScore(),
@@ -15,20 +16,21 @@ vals1 = [
     # factors.Industry(),
 ]
 
-vals2 = [
-    factors.Size(),
-    factors.Value(),
-    factors.Turnover(),
-    # factors.Momentum(12,1),
-    factors.FScore(),
-    # factors.MScore(),
-    factors.Industry(),
-]
-
 pred = factor_lab.revenue(vals1, 48)
 print(pred)
 
-pred.to_csv(factors.wpath('prediction2'))
+pred.to_csv(factors.wpath('prediction1_m'))
+
+
+# vals2 = [
+#     factors.Size(),
+#     factors.Value(),
+#     factors.Turnover(),
+#     # factors.Momentum(12,1),
+#     factors.FScore(),
+#     # factors.MScore(),
+#     factors.Industry(),
+# ]
 
 # rsk = factor_lab.risk(vals2, 48)
 # print(rsk)

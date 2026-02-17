@@ -1,12 +1,12 @@
 from .pv_data import get_monthly_hfq, get_monthly_qfq, get_monthly_index, get_monthly_hfq_change
 from .financial_data import get_financial_data
-from .stock_list import get_stock_list, get_index_list, get_st_list
+from .stock_list import get_stock_list, get_index_list, get_st_list, get_name
 from .double_sorting import double_sort
 
 __all__ = ['double_sort',
            'get_monthly_hfq','get_monthly_qfq', 'get_monthly_hfq_change',
            'get_financial_data', 'get_monthly_index',
-           'get_stock_list', 'get_index_list', 'get_st_list']
+           'get_stock_list', 'get_index_list', 'get_st_list', 'get_name']
 
 """
 get_monthly_hfq/get_monthly_qfq
