@@ -9,25 +9,32 @@ vals1 = [
     factors.Market(),
     # factors.Size(),
     # factors.Value(),
-    # factors.Turnover(),
+    factors.Turnover(),
     # factors.Momentum(12,1),
     factors.FScore(),
     # factors.MScore(),
     # factors.Industry(),
     # factors.EP(),
     # factors.BM(),
-    # factors.ROE(),
+    factors.ROE(),
     # factors.VOL(),
     # factors.MAX(),
-    factors.TO(),
+    # factors.TO(),
     # factors.ABTO(),
     factors.ILL(),
     # factors.STR(),
 ]
 
-pred = factor_lab.revenue(vals1, 36)
+period_dict = {
+    'turnover':36,
+    'F-Score':36,
+    'ROE':24,
+    'ILL':12,
+}
+
+pred = factor_lab.revenue(vals1, 36, period_dict)
 print(pred)
-pred.to_csv(factors.wpath('pred_TO_ILL_FS_36'))
+pred.to_csv(factors.wpath('pred_T_FS_ILL_ROE'))
 
 
 # vals2 = [

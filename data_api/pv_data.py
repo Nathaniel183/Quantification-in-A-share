@@ -56,7 +56,7 @@ def get_monthly_hfq(start_time:str='19900101', end_time:str='20991231',attr:list
 
 def get_monthly_qfq(start_time:str='19900101', end_time:str='20991231',attr:list = ['日期','股票代码','开盘','收盘']):
     """
-    获取所有股票数据 月线后复权
+    获取所有股票数据 月线前复权
     :param start_time:
     :param end_time:
     :param attr:
@@ -79,6 +79,46 @@ def get_monthly_qfq(start_time:str='19900101', end_time:str='20991231',attr:list
         if True: #code.startswith('0'):
             # print(code)
             file_path = datapath.pv_monthly_qfq_path(code)
+            if not os.path.exists(file_path):
+                continue
+            data = pd.read_csv(file_path, dtype={'股票代码':str}).loc[:,attr]
+            data['日期'] = data['日期'].str.replace('-','')
+            data = data.loc[(data['日期'] >= start_time) & (data['日期'] <= end_time)]
+            data['日期'] = data.loc[:,'日期'].str.slice(0,6)
+
+            datas = pd.concat([datas, data], ignore_index=True)
+
+    datas.rename(columns={'日期':'date', '股票代码':'code','开盘':'open','收盘':'close'},inplace=True)
+    datas.set_index(['date','code'], inplace=True)
+    # print(datas['date'])
+    return datas
+
+
+def get_monthly(start_time:str='19900101', end_time:str='20991231',attr:list = ['日期','股票代码','开盘','收盘']):
+    """
+    获取所有股票数据 月线不复权
+    :param start_time:
+    :param end_time:
+    :param attr:
+    :return:
+    """
+
+    stocks = pd.read_csv(datapath.stock_path, dtype={'股票代码':str})
+    datas = pd.DataFrame({
+        '日期': pd.Series(dtype='str'),
+        '股票代码': pd.Series(dtype='str'),
+        '开盘': pd.Series(dtype='float'),
+        '收盘': pd.Series(dtype='float')
+    })
+    for index, row in stocks.iterrows():
+        code:str = row['股票代码']
+
+        # 去除科创版
+        if code.startswith('688') or code.startswith('3') or code.startswith('9'):
+            continue
+        if True: #code.startswith('0'):
+            # print(code)
+            file_path = datapath.pv_monthly_path(code)
             if not os.path.exists(file_path):
                 continue
             data = pd.read_csv(file_path, dtype={'股票代码':str}).loc[:,attr]
@@ -182,15 +222,17 @@ def get_daily_hfq(attr: list = ['开盘价', '收盘价']):
 
 
 if __name__ == "__main__":
-    datas = get_daily_hfq()
-    print(datas)
-    datas = get_daily_hfq(attr=['换手率'])
-    print(datas)
-    datas = get_daily_hfq(attr=['市盈率'])
-    print(datas)
-    datas = get_daily_hfq(attr=['市销率'])
-    print(datas)
+    # datas = get_daily_hfq()
+    # print(datas)
+    # datas = get_daily_hfq(attr=['换手率'])
+    # print(datas)
+    # datas = get_daily_hfq(attr=['市盈率'])
+    # print(datas)
+    # datas = get_daily_hfq(attr=['市销率'])
+    # print(datas)
 
+    datas = get_monthly()
+    print(datas)
 
 
 

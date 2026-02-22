@@ -118,10 +118,14 @@ class StgPred(Strategy):
         # 3.剔除无法购买的股票
         ret = ret[ret['code'].isin(self.code_cur)]
 
+        # 4.剔除涨停股票
+        (limit_up, limit_down) = data_api.get_limit_codes(self.date_cur)
+        ret = ret[~ret['code'].isin(limit_up)]
+
         print(ret)
 
         # 清仓 或使用self.sell函数单笔卖出
-        self.clear()
+        self.clear(exclusion=limit_down)
 
         # 计算购买数量
         counts = []
@@ -146,11 +150,12 @@ class StgPred(Strategy):
 
 
 if __name__ == '__main__':
-    stg_name='pred_TO_ILL_36'
+    stg_name='pred_T_FS_ILL_ROE_12'
+
     # 策略初始化
     strategy = StgPred(cash=10000000,
-                       datas=data_api.get_monthly_qfq('20240201', '20260201'),
-                       wpath=factors.wpath(stg_name), max_num=5, save=False, stg_name=stg_name)
+                       datas=data_api.get_monthly('20200201', '20260201'),
+                       wpath=factors.wpath(stg_name), max_num=10, save=True, stg_name=stg_name)
 
     # 回测执行
     strategy.run()

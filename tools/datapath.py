@@ -12,6 +12,7 @@ index_path = data_path + "指数列表.csv"
 name_path = data_path + "name.csv"
 st_path = data_path + "退市股票列表.csv"
 con_daily_hfq_path = data_path + "daily_hfq.csv"
+limit_path = data_path + "limit.csv"
 
 def pv_daily_hfq_path(code:str)->str:
     return data_path + f"daily_hfq/{code}.csv"
@@ -21,6 +22,9 @@ def pv_monthly_hfq_path(code:str)->str:
 
 def pv_monthly_qfq_path(code:str)->str:
     return data_path + f"monthly_qfq/{code}_monthly_qfq.csv"
+
+def pv_monthly_path(code:str)->str:
+    return data_path + f"monthly/{code}_monthly.csv"
 
 def pv_index_path(code:str)->str:
     return data_path + f"指数_月_kline/{code}_月.csv"

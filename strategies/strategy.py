@@ -189,14 +189,18 @@ class Strategy(ABC):
         self._order_exe()
 
     @final
-    def clear(self):
+    def clear(self, exclusion:pd.Series = None):
         """
         清仓
+        :param exclusion: 被排除的code
         :return:
         """
+        if exclusion is None:
+            exclusion = []
+
         for code, row in self.position.iterrows():
             pos = row['pos']
-            if pos != 0:
+            if pos != 0 and code not in exclusion:
                 self.sell(str(code), 0, pos, False)
 
     @final

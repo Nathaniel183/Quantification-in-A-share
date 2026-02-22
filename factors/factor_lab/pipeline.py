@@ -3,7 +3,7 @@ import numpy as np
 import factors
 from factors import factor_lab
 
-def revenue(vals:list[factors.Factor], period:int=12):
+def revenue(vals:list[factors.Factor], period:int = 12, period_dict:dict=None):
     # 1.构建收益率和变量
     change = factors.Change()
     df = factor_lab.concat(vals)
@@ -15,14 +15,28 @@ def revenue(vals:list[factors.Factor], period:int=12):
     if 'market' in df.columns: df = df.drop('market', axis=1)
     # 3.计算预计收益率
     result_list = []
+
+    if period_dict is None:
+        max_period = period
+    else:
+        max_period = max(period_dict.values())
+
     for d_i, date in enumerate(date_list[1:]):
         i = params.index.get_loc(date_list[d_i])
         # print(f"时期 -- {date}")
         # 4.跳过前period个时期
-        if i < period-1:
+        if i < max_period-1:
             continue
         # 5.计算参数平均值
-        par_m = params[i-period+1:i+1].mean()
+        if period_dict is None:
+            par_m = params[i-period+1:i+1].mean()
+        else:
+            par_m = pd.Series({
+                col: params[col].iloc[i - period_dict.get(col, period) + 1:i + 1].mean()
+                if col in period_dict else
+                params[col].iloc[i - period + 1:i + 1].mean()
+                for col in params.columns
+            })
         # 6.预测
         result = factor_lab.predict(df, par_m, date)
         result_list.append(result)

@@ -114,9 +114,13 @@ class StgWeight(Strategy):
         ret = ret.reset_index(drop=False)
         st = self.stock_name.loc[self.stock_name[self.date_cur].str.contains('ST', na=False) & self.stock_name[self.date_cur].notna(), '股票代码']
         ret = ret[~ret['code'].isin(st)]
-        # 3.剔除无法购买的股票
+        ## 3.剔除无法购买的股票
         ret = ret[ret['code'].isin(self.code_cur)]
-        ## 4.排序并截取（截取后重新归一化到和为1）
+        ## 4.剔除涨停股票
+        (limit_up, limit_down) = data_api.get_limit_codes(self.date_cur)
+        ret = ret[~ret['code'].isin(limit_up)]
+
+        ## 5.排序并截取（截取后重新归一化到和为1）
         ret = ret.sort_values(ascending=False, by='w')
         if len(ret) > self.max_num:
             ret = ret[:self.max_num]
@@ -124,7 +128,7 @@ class StgWeight(Strategy):
         print(ret)
 
         # 清仓 或使用self.sell函数单笔卖出
-        self.clear()
+        self.clear(exclusion=limit_down)
 
         # 计算购买数量
         counts = []
