@@ -6,6 +6,7 @@
 
 import factor_builder
 
-factor_builder.build_change()
-factor_builder.build_industry_dummies()
-factor_builder.build_factors(start='201512',end='202602')
+# factor_builder.build_change()
+# factor_builder.build_market()
+# factor_builder.build_industry_dummies()
+factor_builder.build_factors(start='201001',end='202602')

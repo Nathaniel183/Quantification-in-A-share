@@ -158,7 +158,8 @@ def _compute(codes:pd.Series, date:str, q:str):
 
 
 if __name__ == '__main__':
-    codes = pd.read_csv("../../dataset/股票列表.csv", dtype=str)['股票代码']
-    ret = _compute_fscore(codes, '202011')
-    print(len(ret[ret['F-Score']==0]))
-    print(ret)
+    pass
+    # codes = pd.read_csv("../../dataset/股票列表.csv", dtype=str)['股票代码']
+    # ret = _compute_fscore(codes, '202011')
+    # print(len(ret[ret['F-Score']==0]))
+    # print(ret)

@@ -79,7 +79,7 @@ class StgPred(Strategy):
         4.可选择重写custom_finally函数进行执行后处理。
         5.在主进程中初始化并调用run执行回测。
     """
-    def __init__(self, cash: float, datas: pd.DataFrame, wpath:str, max_num:int=20, save:bool=True):
+    def __init__(self, cash: float, datas: pd.DataFrame, wpath:str, max_num:int=20, save:bool=True, stg_name:str=''):
         """
         :param cash: 本金
         :param datas: 固定格式，DataFrame(index=(date, code), col=['open', 'close', ...], open、close必备)
@@ -90,7 +90,10 @@ class StgPred(Strategy):
         super().__init__(cash, datas, save)
 
         # 设置策略名
-        self.strategy_name = "预测收益率策略"
+        if stg_name == '':
+            self.strategy_name = "预测收益率策略"
+        else:
+            self.strategy_name = stg_name
         self.max_num = max_num
         self.weight:pd.DataFrame = pd.read_csv(wpath, index_col=(0, 1), dtype={'code':str, 'date':str})
         self.stock_name = data_api.get_name()
@@ -103,10 +106,18 @@ class StgPred(Strategy):
         self.notify(f"时间 -- {self.date_cur}")
 
         # 用策略计算出需要操作的标的代码
+
+        ## 1.获取权重
         ret = self.weight.xs(self.date_cur, level='date')
         ret = ret.sort_values(ascending=False, by='prediction').reset_index(drop=False)
+
+        # 2.剔除ST
         st = self.stock_name.loc[self.stock_name[self.date_cur].str.contains('ST', na=False) & self.stock_name[self.date_cur].notna(), '股票代码']
         ret = ret[~ret['code'].isin(st)]
+
+        # 3.剔除无法购买的股票
+        ret = ret[ret['code'].isin(self.code_cur)]
+
         print(ret)
 
         # 清仓 或使用self.sell函数单笔卖出
@@ -135,10 +146,11 @@ class StgPred(Strategy):
 
 
 if __name__ == '__main__':
+    stg_name='pred_TO_ILL_36'
     # 策略初始化
     strategy = StgPred(cash=10000000,
                        datas=data_api.get_monthly_qfq('20240201', '20260201'),
-                       wpath=factors.wpath('prediction1'), max_num=5, save=False)
+                       wpath=factors.wpath(stg_name), max_num=5, save=False, stg_name=stg_name)
 
     # 回测执行
     strategy.run()

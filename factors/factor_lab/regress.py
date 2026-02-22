@@ -7,7 +7,7 @@ def ols_regress(change:factors.Factor, vals:pd.DataFrame):
 
     t_values = []
     coefs = []
-    date_list = change.get_date_index()
+    date_list = sorted(list(set(change.get_date_index())&set(vals.index.get_level_values('date').unique())))
     for i, date in enumerate(date_list):
 
         change_t = change.get_data(date)
@@ -55,7 +55,7 @@ def wls_regress(change:factors.Factor, vals:pd.DataFrame, w:pd.DataFrame):
     t_values = []
     coefs = []
     resid_rows = []
-    date_list = change.get_date_index()
+    date_list = sorted(list(set(change.get_date_index()) & set(vals.index.get_level_values('date').unique())))
     for i, date in enumerate(date_list):
 
         change_t = change.get_data(date)

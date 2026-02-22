@@ -8,6 +8,8 @@ def revenue(vals:list[factors.Factor], period:int=12):
     change = factors.Change()
     df = factor_lab.concat(vals)
     date_list = df.index.get_level_values('date').unique().tolist()
+    date_list = sorted(date_list)
+
     # 2.回归获得系数
     params = factor_lab.ols_regress(change, df)
     if 'market' in df.columns: df = df.drop('market', axis=1)
@@ -36,6 +38,7 @@ def risk(vals:list[factors.Factor], period:int=12):
 
     df = factor_lab.concat(vals)
     date_list = df.index.get_level_values('date').unique().tolist()
+    date_list = sorted(date_list)
     # 2.回归获得系数和残差
     params, residuals = factor_lab.wls_regress(change, df, w)
 

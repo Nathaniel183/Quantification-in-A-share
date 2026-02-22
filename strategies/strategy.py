@@ -313,13 +313,15 @@ class Strategy(ABC):
                 key = (self.date_cur, code)
                 key_1 = (self.date_list[self.date_index-1], code)
                 close_price = self.datas.loc[key, 'close'] if key in self.datas.index else 0
-                close_price_1 = self.datas.loc[key_1, 'close'] if key_1 in self.datas.index else 0
+                open_price = self.datas.loc[key, 'open'] if key in self.datas.index else 0
+                # close_price_1 = self.datas.loc[key_1, 'close'] if key_1 in self.datas.index else 0
                 pos = row['pos']
                 if pos != 0:
                     position_df = pd.DataFrame({
                         'date': [self.date_cur],
                         'code': [code],
-                        'income': [f"{(close_price/close_price_1-1) if close_price_1 != 0 else None}"],
+                        'income': [f"{(close_price/open_price-1) if open_price != 0 else None}"],
+                        # 'income': [f"{(close_price/close_price_1-1) if close_price_1 != 0 else None}"],
                     })
                     self.position_record = pd.concat([self.position_record, position_df], ignore_index=True)
         else: # 第一个 date

@@ -76,8 +76,8 @@ def _compute(codes:pd.Series, date:str, q:str):
 
 
 
-if __name__ == '__main__':
-    codes = pd.read_csv("../../dataset/股票列表.csv", dtype=str)['股票代码']
-    ret = _compute_value(codes, '202001')
-    print(len(ret[ret['value'].isna()]))
-    print(ret)
+# if __name__ == '__main__':
+#     codes = pd.read_csv("../../dataset/股票列表.csv", dtype=str)['股票代码']
+#     ret = _compute_value(codes, '202001')
+#     print(len(ret[ret['value'].isna()]))
+#     print(ret)

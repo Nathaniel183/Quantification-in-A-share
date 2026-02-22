@@ -4,6 +4,17 @@ from .mscore_index import _compute_mscore
 from .size_factor import _compute_size
 from .value_factor import _compute_value
 from .turnover_factor import _compute_turnover
+
+from .ROE import _compute_ROE
+from .TO import _compute_TO
+from .ABTO import _compute_ABTO
+from .VOL import _compute_VOL
+from .MAX import _compute_MAX
+from .ILL import _compute_ILL
+from .EP import _compute_EP
+from .BM import _compute_BM
+# from .CFP import *
+
 import data_api
 from tools import month_tool
 import pandas as pd
@@ -22,6 +33,15 @@ def build_factors(start:str='200001', end:str='209912'):
     codes = data_api.get_stock_list()['股票代码']
     print(codes)
 
+    _build_factor(_compute_ROE,codes,start,end,'ROE')
+    _build_factor(_compute_TO,codes,start,end,'TO')
+    _build_factor(_compute_ABTO,codes,start,end,'ABTO')
+    _build_factor(_compute_VOL,codes,start,end,'VOL')
+    _build_factor(_compute_MAX,codes,start,end,'MAX')
+    _build_factor(_compute_ILL,codes,start,end,'ILL')
+    _build_factor(_compute_EP,codes,start,end,'EP')
+    _build_factor(_compute_BM,codes,start,end,'BM')
+
     fscore = _build_factor(_compute_fscore,codes,start,end,'F-Score')
     mscore = _build_factor(_compute_mscore,codes,start,end,'M-Score')
     size = _build_factor(_compute_size,codes,start,end,'size')
@@ -31,7 +51,6 @@ def build_factors(start:str='200001', end:str='209912'):
     mmt_n3s0 = _build_factor(_compute_momentum,codes,start,end,"momentum_n3_s0", n=3,skip=0)
     mmt_n6s0 = _build_factor(_compute_momentum,codes,start,end,"momentum_n6_s0", n=6,skip=0)
     mmt_n12s1 = _build_factor(_compute_momentum,codes,start,end,"momentum_n12_s1", n=12,skip=1)
-
 
 def _build_factor(
         compute_func,  # 计算函数
@@ -98,5 +117,5 @@ def _build_factor(
 
 
 if __name__ == '__main__':
-    build_factors(start='201512',end='202602')
+    build_factors(start='201001',end='202602')
 

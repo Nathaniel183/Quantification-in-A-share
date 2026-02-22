@@ -2,7 +2,7 @@ import os
 import pandas as pd
 from tools import datapath
 
-def get_monthly_hfq_change(start_time:str='20151201', end_time:str='20991231'):
+def get_monthly_hfq_change(start_time:str='20000101', end_time:str='20991231'):
     """
     获取所有股票涨跌幅 月度后复权
     :param start_time:
@@ -124,15 +124,73 @@ def get_monthly_index(codes:pd.Series=pd.Series(['000001'], name='代码'),
 
     return datas
 
-if __name__ == "__main__":
-    #datas = get_monthly_hfq('20200101', '20251031')
-    # for date in datas.index.levels[0]:
-    #     print(date)
-    #     print(datas.loc[(date,'000001'),'open'])
 
-    # 构造市场因子
-    datas = get_monthly_index()
-    datas['market'] = (datas['收盘']/datas['开盘'])-1
-    market = datas[['日期','market']].rename(columns={'日期':'date'})
-    print(market)
-    market.to_csv('market.csv', index=False)
+def update_daily_hfq(start_time:str='19900101', end_time:str='20991231'):
+    stocks = pd.read_csv(datapath.stock_path, dtype={'股票代码': str})
+    datas = pd.DataFrame({
+        '交易日期': pd.Series(dtype='str'),
+        '股票代码': pd.Series(dtype='str'),
+    })
+    for index, row in stocks.iterrows():
+        code: str = row['TS代码']
+
+        # 去除科创版
+        if code.startswith('68') or code.startswith('3') or code.startswith('9'):
+            continue
+
+        file_path = datapath.pv_daily_hfq_path(code)
+        if not os.path.exists(file_path):
+            continue
+
+        print(code)
+        data = pd.read_csv(file_path, dtype={'股票代码': str, '交易日期': str})
+        data['交易日期'] = data['交易日期'].str.replace('-', '')
+        data['股票代码'] = data['股票代码'].str.split('.').str[0]
+        data = data.loc[(data['交易日期'] >= start_time) & (data['交易日期'] <= end_time)]
+
+        datas = pd.concat([datas, data], ignore_index=True)
+
+    datas.rename(columns={'交易日期': 'date', '股票代码': 'code'}, inplace=True)
+    datas.set_index(['date', 'code'], inplace=True)
+    datas.to_csv(datapath.con_daily_hfq_path)
+    print(datas)
+
+
+def get_daily_hfq(attr: list = ['开盘价', '收盘价']):
+    """
+
+    :param attr: 需要的数据list
+        股票代码	交易日期	开盘价	最高价	最低价	收盘价	昨收价
+        涨跌额	涨跌幅	成交量(手)	成交额(千元)	换手率	换手率(自由流通股)	量比
+        市盈率	市盈率TTM	市净率	市销率	市销率TTM	股息率	股息率TTM
+        总股本(万股)	流通股本(万股)	自由流通股本(万股)	总市值(万元)	流通市值(万元)
+    :return: DataFrame(index=(date,code), col=attr)
+    """
+    fix_attr = ['date', 'code']
+    attr = fix_attr + attr
+
+    # 使用函数属性作为缓存
+    if not hasattr(get_daily_hfq, '_cache'):
+        get_daily_hfq._cache = pd.read_csv(datapath.con_daily_hfq_path,
+                                           dtype={'date': str, 'code': str})
+
+    datas = get_daily_hfq._cache.loc[:, attr]
+    datas[['date', 'code']] = datas[['date', 'code']].astype(str)
+    datas.set_index(['date', 'code'], inplace=True)
+    return datas
+
+
+
+if __name__ == "__main__":
+    datas = get_daily_hfq()
+    print(datas)
+    datas = get_daily_hfq(attr=['换手率'])
+    print(datas)
+    datas = get_daily_hfq(attr=['市盈率'])
+    print(datas)
+    datas = get_daily_hfq(attr=['市销率'])
+    print(datas)
+
+
+
+

@@ -1,4 +1,6 @@
 import os
+
+import numpy as np
 import pandas as pd
 
 class Factor:
@@ -21,12 +23,16 @@ class Factor:
         get_date_index:获取数据所有date索引
         get_code_index:获取数据所有code索引
     """
-    def __init__(self, name:str, dshape:str, standardize:bool=True, extremum:float=0.05):
+    def __init__(self, name:str, dshape:str,
+                 standardize:bool=True, extremum:float=0.05,
+                 need_log:bool=False, log_bias:float=0.0):
         self.name = name
         self.dshape = dshape # N_T, NT_K, N_K, T_K
         self.data = None
         self.standardize = standardize
         self.extremum = extremum
+        self.need_log = need_log
+        self.log_bias = log_bias
 
         print(f"读取变量 {self.name} -- {self.dshape}")
         self._init_data()
@@ -99,12 +105,16 @@ class Factor:
             factor_cols = [col for col in df_copy.columns]
 
             for col in factor_cols:
-                # 1. 去极值
+                # 1. 取log
+                if self.need_log:
+                    df_copy[col] = np.log(df_copy[col]+self.log_bias)
+
+                # 2. 去极值
                 lower = df_copy[col].quantile(extremum)
                 upper = df_copy[col].quantile(1 - extremum)
                 df_copy[col] = df_copy[col].clip(lower=lower, upper=upper)
 
-                # 2. 标准化
+                # 3. 标准化
                 mean_val = df_copy[col].mean()
                 std_val = df_copy[col].std()
                 if std_val > 0:
@@ -174,8 +184,48 @@ class MScore(Factor):
         super().__init__("M-Score", "N_T")
 
 class Momentum(Factor):
-    def __init__(self, n:int=6, skip:int=0):
-        super().__init__(f"momentum_n{n}_s{skip}", "N_T")
+    def __init__(self, n:int=6, skip:int=0, extremum:float=0.05):
+        super().__init__(f"momentum_n{n}_s{skip}", "N_T", extremum=extremum)
+
+class EP(Factor):
+    def __init__(self):
+        super().__init__("EP", "N_T", extremum=0.01)
+
+class BM(Factor):
+    def __init__(self):
+        super().__init__("BM", "N_T", extremum=0.01,
+                         need_log=True, log_bias=0.0)
+
+class ROE(Factor):
+    def __init__(self):
+        super().__init__("ROE", "N_T", extremum=0.02)
+
+class VOL(Factor):
+    def __init__(self):
+        super().__init__("VOL", "N_T", extremum=0.01)
+
+class MAX(Factor):
+    def __init__(self):
+        super().__init__("MAX", "N_T", extremum=0.02)
+
+class TO(Factor):
+    def __init__(self):
+        super().__init__("TO", "N_T", extremum=0.01,
+                         need_log=True, log_bias=1.0)
+
+class ABTO(Factor):
+    def __init__(self):
+        super().__init__("ABTO", "N_T", extremum=0.02,
+                         need_log=True, log_bias=1.0)
+
+class ILL(Factor):
+    def __init__(self):
+        super().__init__("ILL", "N_T", extremum=0.02,
+                         need_log=True, log_bias=1.0)
+
+class STR(Momentum):
+    def __init__(self):
+        super().__init__(n=1, skip=0, extremum=0.01)
 
 if __name__ == '__main__':
     factor1 = Change()

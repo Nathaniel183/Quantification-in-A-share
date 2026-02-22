@@ -197,8 +197,8 @@ def _compute(codes:pd.Series, date:str, q:str):
 
     return datas[['股票代码', 'M-Score']]
 
-if __name__ == '__main__':
-    codes = pd.read_csv("../../dataset/股票列表.csv", dtype=str)['股票代码']
-    ret = _compute_mscore(codes, '202004')
-    print(len(ret[ret['M-Score'].isna()]))
-    print(ret)
+# if __name__ == '__main__':
+#     codes = pd.read_csv("../../dataset/股票列表.csv", dtype=str)['股票代码']
+#     ret = _compute_mscore(codes, '202004')
+#     print(len(ret[ret['M-Score'].isna()]))
+#     print(ret)

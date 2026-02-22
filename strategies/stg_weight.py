@@ -79,7 +79,7 @@ class StgWeight(Strategy):
         4.可选择重写custom_finally函数进行执行后处理。
         5.在主进程中初始化并调用run执行回测。
     """
-    def __init__(self, cash: float, datas: pd.DataFrame, wpath:str, max_num:int=20, save:bool=True):
+    def __init__(self, cash: float, datas: pd.DataFrame, wpath:str, max_num:int=20, save:bool=True, stg_name:str=''):
         """
         :param cash: 本金
         :param datas: 固定格式，DataFrame(index=(date, code), col=['open', 'close', ...], open、close必备)
@@ -90,7 +90,10 @@ class StgWeight(Strategy):
         super().__init__(cash, datas, save)
 
         # 设置策略名
-        self.strategy_name = "权重"
+        if stg_name == '':
+            self.strategy_name = "权重"
+        else:
+            self.strategy_name = stg_name
         self.max_num = max_num
         self.weight:pd.DataFrame = pd.read_csv(wpath, index_col=(0, 1), dtype={'code':str, 'date':str})
         self.stock_name = data_api.get_name()
@@ -111,7 +114,9 @@ class StgWeight(Strategy):
         ret = ret.reset_index(drop=False)
         st = self.stock_name.loc[self.stock_name[self.date_cur].str.contains('ST', na=False) & self.stock_name[self.date_cur].notna(), '股票代码']
         ret = ret[~ret['code'].isin(st)]
-        ## 3.排序并截取（截取后重新归一化到和为1）
+        # 3.剔除无法购买的股票
+        ret = ret[ret['code'].isin(self.code_cur)]
+        ## 4.排序并截取（截取后重新归一化到和为1）
         ret = ret.sort_values(ascending=False, by='w')
         if len(ret) > self.max_num:
             ret = ret[:self.max_num]

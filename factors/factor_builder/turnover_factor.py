@@ -33,8 +33,8 @@ def _compute_turnover(codes:pd.Series, date:str):
     return datas[['股票代码', 'turnover']]
 
 
-if __name__ == '__main__':
-    codes = pd.read_csv("../../dataset/股票列表.csv", dtype=str)['股票代码']
-    ret = _compute_turnover(codes, '202512')
-    print(len(ret[ret['turnover'].isna()]))
-    print(ret)
+# if __name__ == '__main__':
+#     codes = pd.read_csv("../../dataset/股票列表.csv", dtype=str)['股票代码']
+#     ret = _compute_turnover(codes, '202512')
+#     print(len(ret[ret['turnover'].isna()]))
+#     print(ret)
