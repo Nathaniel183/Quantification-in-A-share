@@ -5,7 +5,7 @@ import os
 # data_path = current_file_path+"/../dataset/"
 
 # 指定系统中数据库绝对路径
-data_path = "D:/Projects/PythonProject/量化数据库/"
+data_path = "D:/Projects/PythonProject/A-share_database/"
 
 stock_path = data_path + "股票列表.csv"
 index_path = data_path + "指数列表.csv"
