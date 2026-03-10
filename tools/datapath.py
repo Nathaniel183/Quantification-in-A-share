@@ -11,11 +11,11 @@ stock_path = data_path + "股票列表.csv"
 index_path = data_path + "指数列表.csv"
 name_path = data_path + "name.csv"
 st_path = data_path + "退市股票列表.csv"
-con_daily_hfq_path = data_path + "daily_hfq.csv"
+con_daily_index_path = data_path + "每日指标.csv"
 limit_path = data_path + "limit.csv"
 
-def pv_daily_hfq_path(code:str)->str:
-    return data_path + f"daily_hfq/{code}.csv"
+def pv_daily_index_path(code:str)->str:
+    return data_path + f"每日指标/{code}.csv"
 
 def pv_monthly_hfq_path(code:str)->str:
     return data_path + f"monthly_hfq/{code}_monthly_hfq.csv"
@@ -34,3 +34,5 @@ def financial_path(quarter:str)->str:
 
 def financial_path_v2(quarter:str)->str:
     return data_path + f"财务数据/转换结果/{quarter}.csv"
+
+

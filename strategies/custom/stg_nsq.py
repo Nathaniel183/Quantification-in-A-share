@@ -3,7 +3,7 @@
 """
 import pandas as pd
 from strategies.strategy import Strategy
-from data_api.nsq_data import get_nsq_m
+from data_api.foreign_data import get_nsq_m
 class StgPattern(Strategy):
     """
     策略类

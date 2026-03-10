@@ -165,7 +165,7 @@ def get_monthly_index(codes:pd.Series=pd.Series(['000001'], name='代码'),
     return datas
 
 
-def update_daily_hfq(start_time:str='19900101', end_time:str='20991231'):
+def update_daily_index(start_time:str= '19900101', end_time:str= '20991231'):
     stocks = pd.read_csv(datapath.stock_path, dtype={'股票代码': str})
     datas = pd.DataFrame({
         '交易日期': pd.Series(dtype='str'),
@@ -178,7 +178,7 @@ def update_daily_hfq(start_time:str='19900101', end_time:str='20991231'):
         if code.startswith('68') or code.startswith('3') or code.startswith('9'):
             continue
 
-        file_path = datapath.pv_daily_hfq_path(code)
+        file_path = datapath.pv_daily_index_path(code)
         if not os.path.exists(file_path):
             continue
 
@@ -192,11 +192,11 @@ def update_daily_hfq(start_time:str='19900101', end_time:str='20991231'):
 
     datas.rename(columns={'交易日期': 'date', '股票代码': 'code'}, inplace=True)
     datas.set_index(['date', 'code'], inplace=True)
-    datas.to_csv(datapath.con_daily_hfq_path)
+    datas.to_csv(datapath.con_daily_index_path)
     print(datas)
 
 
-def get_daily_hfq(attr: list = ['开盘价', '收盘价']):
+def get_daily_index(attr: list = ['开盘价', '收盘价']):
     """
 
     :param attr: 需要的数据list
@@ -210,11 +210,11 @@ def get_daily_hfq(attr: list = ['开盘价', '收盘价']):
     attr = fix_attr + attr
 
     # 使用函数属性作为缓存
-    if not hasattr(get_daily_hfq, '_cache'):
-        get_daily_hfq._cache = pd.read_csv(datapath.con_daily_hfq_path,
-                                           dtype={'date': str, 'code': str})
+    if not hasattr(get_daily_index, '_cache'):
+        get_daily_index._cache = pd.read_csv(datapath.con_daily_index_path,
+                                             dtype={'date': str, 'code': str})
 
-    datas = get_daily_hfq._cache.loc[:, attr]
+    datas = get_daily_index._cache.loc[:, attr]
     datas[['date', 'code']] = datas[['date', 'code']].astype(str)
     datas.set_index(['date', 'code'], inplace=True)
     return datas
@@ -231,8 +231,9 @@ if __name__ == "__main__":
     # datas = get_daily_hfq(attr=['市销率'])
     # print(datas)
 
-    datas = get_monthly()
-    print(datas)
+    # datas = get_monthly()
+    # print(datas)
 
+    update_daily_index()
 
 

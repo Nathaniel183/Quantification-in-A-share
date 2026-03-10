@@ -4,7 +4,7 @@
 
 import pandas as pd
 from tools import month_tool
-from data_api import get_daily_hfq
+from data_api import get_daily_index
 
 
 def _compute_MAX(codes: pd.Series, date: str):
@@ -22,7 +22,7 @@ def _compute_MAX(codes: pd.Series, date: str):
     # 获取日收益率标准差
     m_1 = month_tool.prev_month(date, 1)+'01'
     date = date + '01'
-    change = get_daily_hfq(['涨跌幅'])
+    change = get_daily_index(['涨跌幅'])
     change = change[(change.index.get_level_values('date') >= m_1) & (change.index.get_level_values('date') <= date)]
     change = change.groupby(level='code').apply(lambda x: x['涨跌幅'].nlargest(5).mean()).rename('MAX')
     change = change.reset_index().rename(columns={'code': '股票代码'})

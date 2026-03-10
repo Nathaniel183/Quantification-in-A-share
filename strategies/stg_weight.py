@@ -153,10 +153,12 @@ class StgWeight(Strategy):
 
 
 if __name__ == '__main__':
+    stg_name='w_T_FS_r_MISMoV'
+
     # 策略初始化
     strategy = StgWeight(cash=10000000,
-                         datas=data_api.get_monthly_qfq('20200201', '20260201'),
-                         wpath=factors.wpath('w1'), max_num=5, save=False)
+                         datas=data_api.get_monthly('20200201', '20260301'),
+                         wpath=factors.wpath(stg_name), max_num=10, save=True, stg_name=stg_name)
 
     # 回测执行
     strategy.run()

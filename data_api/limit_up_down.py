@@ -170,7 +170,7 @@ def _load_limit_df(limit_df_or_path: pd.DataFrame | str) -> pd.DataFrame:
 
 from data_api import get_monthly
 if __name__ == "__main__":
-    # build_month_open_limit_df(get_monthly())
-    (up,down) = get_limit_codes('202601')
-    print(up)
-    print(down)
+    build_month_open_limit_df(get_monthly())
+    # (up,down) = get_limit_codes('202601')
+    # print(up)
+    # print(down)

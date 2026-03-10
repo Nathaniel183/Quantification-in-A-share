@@ -127,7 +127,7 @@ class StgPattern(Strategy):
 if __name__ == '__main__':
     # 策略初始化
     strategy = StgPattern(cash=10000000,
-                          datas=data_api.get_monthly_qfq('20240901', '20251201'),
+                          datas=data_api.get_monthly('20240901', '20251201'),
                           save=False)
 
     # 回测执行

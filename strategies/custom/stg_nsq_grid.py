@@ -7,7 +7,7 @@ NSQ 网格策略（单标的：code 只有 'nsq'）
 """
 import pandas as pd
 from strategies.strategy import Strategy
-from data_api import nsq_data
+from data_api import foreign_data
 
 
 class StgNsqGrid(Strategy):

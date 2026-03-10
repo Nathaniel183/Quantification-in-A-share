@@ -5,7 +5,7 @@
 import pandas as pd
 import numpy as np
 from tools import month_tool
-from data_api import get_monthly_hfq, get_daily_hfq
+from data_api import get_monthly_hfq, get_daily_index
 
 
 def _compute_ABTO(codes: pd.Series, date: str):
@@ -29,7 +29,7 @@ def _compute_ABTO(codes: pd.Series, date: str):
     # 获取日均换手率
     m_1 = month_tool.prev_month(date, 1)+'01'
     date = date + '01'
-    turnover_d = get_daily_hfq(['换手率(自由流通股)'])
+    turnover_d = get_daily_index(['换手率(自由流通股)'])
     turnover_d = turnover_d[(turnover_d.index.get_level_values('date') >= m_1) & (turnover_d.index.get_level_values('date') <= date)]
     turnover_d = turnover_d.groupby(level='code').mean()
     turnover_d = turnover_d.reset_index().rename(columns={'code': '股票代码', '换手率(自由流通股)': 'TO_d'})

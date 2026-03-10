@@ -1,11 +1,11 @@
 from .pv_data import (get_monthly_hfq, get_monthly_qfq, get_monthly,
-                      get_monthly_index, get_monthly_hfq_change, get_daily_hfq)
+                      get_monthly_index, get_monthly_hfq_change, get_daily_index)
 from .financial_data import get_financial_data, get_financial_data_v2
 from .stock_list import get_stock_list, get_index_list, get_st_list, get_name
 from .double_sorting import double_sort
 from .limit_up_down import get_limit_codes, get_limit_up_codes, get_limit_down_codes
 
-__all__ = ['double_sort', 'get_daily_hfq', 'get_monthly',
+__all__ = ['double_sort', 'get_daily_index', 'get_monthly',
            'get_monthly_hfq','get_monthly_qfq', 'get_monthly_hfq_change', 'get_monthly_index',
            'get_financial_data', 'get_financial_data_v2',
            'get_stock_list', 'get_index_list', 'get_st_list', 'get_name',

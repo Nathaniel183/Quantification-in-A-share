@@ -5,8 +5,8 @@ import pandas as pd
 import data_api
 import factors
 
-date = '202602'
-stg_name='pred_T_FS_ILL_ROE'
+date = '202603'
+stg_name='pred_T_FS'
 
 ret = pd.read_csv(factors.wpath(stg_name), dtype={'code':str, 'date':str}).rename(columns={'code':'股票代码'})
 ret = ret.loc[ret['date']==date].sort_values('prediction',ascending=False)

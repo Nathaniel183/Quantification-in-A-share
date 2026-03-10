@@ -3,7 +3,11 @@ import numpy as np
 import factors
 from factors import factor_lab
 
-def revenue(vals:list[factors.Factor], period:int = 12, period_dict:dict=None):
+def revenue(vals:list[factors.Factor],
+            period:int = 12,
+            period_dict:dict=None,
+            method='mean',
+            **kwargs):
     # 1.构建收益率和变量
     change = factors.Change()
     df = factor_lab.concat(vals)
@@ -27,16 +31,48 @@ def revenue(vals:list[factors.Factor], period:int = 12, period_dict:dict=None):
         # 4.跳过前period个时期
         if i < max_period-1:
             continue
+
         # 5.计算参数平均值
+        # if period_dict is None:
+        #     par_m = params[i-period+1:i+1].mean()
+        # else:
+        #     par_m = pd.Series({
+        #         col: params[col].iloc[i - period_dict.get(col, period) + 1:i + 1].mean()
+        #         if col in period_dict else
+        #         params[col].iloc[i - period + 1:i + 1].mean()
+        #         for col in params.columns
+        #     })
+
         if period_dict is None:
-            par_m = params[i-period+1:i+1].mean()
+            if method == 'mean':
+                par_m = params.iloc[i - period + 1:i + 1].mean()
+            elif method == 'ewma':
+                lam = kwargs.get('lam', 0.94)
+                par_m = params.iloc[i - period + 1:i + 1].apply(
+                    lambda s: ewma_beta(s, lam=lam)
+                )
+            else:
+                raise ValueError(f"Unsupported method: {method}")
         else:
-            par_m = pd.Series({
-                col: params[col].iloc[i - period_dict.get(col, period) + 1:i + 1].mean()
-                if col in period_dict else
-                params[col].iloc[i - period + 1:i + 1].mean()
-                for col in params.columns
-            })
+            if method == 'mean':
+                par_m = pd.Series({
+                    col: params[col].iloc[i - period_dict.get(col, period) + 1:i + 1].mean()
+                    for col in params.columns
+                })
+            elif method == 'ewma':
+                lam_default = kwargs.get('lam', 0.94)
+                lam_dict = kwargs.get('lam_dict', None)
+
+                par_m = pd.Series({
+                    col: ewma_beta(
+                        params[col].iloc[i - period_dict.get(col, period) + 1:i + 1],
+                        lam=lam_dict.get(col, lam_default) if lam_dict is not None else lam_default
+                    )
+                    for col in params.columns
+                })
+            else:
+                raise ValueError(f"Unsupported method: {method}")
+
         # 6.预测
         result = factor_lab.predict(df, par_m, date)
         result_list.append(result)
@@ -129,3 +165,39 @@ def risk(vals:list[factors.Factor], period:int=12):
         sigmas[date] = result
     # ret = pd.concat(result_list, axis=0, ignore_index=False)
     return sigmas
+
+"""
+辅助函数
+"""
+def ewma_beta(beta_series: pd.Series, lam: float = 0.94) -> float:
+    """
+    对一段历史系数做指数加权平均（EWMA）。
+
+    参数
+    ----
+    beta_series : pd.Series
+        历史系数序列，建议按时间从旧到新排列。
+    lam : float, default 0.94
+        指数衰减系数，范围通常在 (0, 1]。
+        - 越接近 1：越平滑，越接近简单均值
+        - 越小：越重视最近几期
+
+    返回
+    ----
+    float
+        EWMA 加权后的系数值
+    """
+    s = pd.Series(beta_series).dropna()
+
+    if len(s) == 0:
+        return np.nan
+
+    if not (0 < lam <= 1):
+        raise ValueError(f"lam must be in (0, 1], got {lam}")
+
+    # 假设 s 按时间从旧到新排列
+    # 越新的数据权重越大
+    n = len(s)
+    weights = lam ** np.arange(n - 1, -1, -1)
+
+    return float(np.dot(s.values, weights) / weights.sum())

@@ -5,7 +5,7 @@
 import pandas as pd
 import numpy as np
 from tools import month_tool
-from data_api import get_daily_hfq
+from data_api import get_daily_index
 
 
 def _compute_EP(codes: pd.Series, date: str):
@@ -22,7 +22,7 @@ def _compute_EP(codes: pd.Series, date: str):
     # 获取日收益率标准差
     m_1 = month_tool.prev_month(date, 1)+'01'
     date = date + '01'
-    ret = get_daily_hfq(['市盈率TTM'])
+    ret = get_daily_index(['市盈率TTM'])
     ret = ret[(ret.index.get_level_values('date') >= m_1) & (ret.index.get_level_values('date') <= date)]
 
     last = ret.sort_index(level=0).groupby(level=1, group_keys=False).tail(1)

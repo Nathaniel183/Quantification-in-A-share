@@ -112,8 +112,8 @@ class StgPred(Strategy):
         ret = ret.sort_values(ascending=False, by='prediction').reset_index(drop=False)
 
         # 2.剔除ST
-        st = self.stock_name.loc[self.stock_name[self.date_cur].str.contains('ST', na=False) & self.stock_name[self.date_cur].notna(), '股票代码']
-        ret = ret[~ret['code'].isin(st)]
+        # st = self.stock_name.loc[self.stock_name[self.date_cur].str.contains('ST', na=False) & self.stock_name[self.date_cur].notna(), '股票代码']
+        # ret = ret[~ret['code'].isin(st)]
 
         # 3.剔除无法购买的股票
         ret = ret[ret['code'].isin(self.code_cur)]
@@ -150,11 +150,11 @@ class StgPred(Strategy):
 
 
 if __name__ == '__main__':
-    stg_name='pred_T_FS_ILL_ROE_12'
+    stg_name='pred_T_FS_ILL_ROE_ewma'
 
     # 策略初始化
     strategy = StgPred(cash=10000000,
-                       datas=data_api.get_monthly('20200201', '20260201'),
+                       datas=data_api.get_monthly('20200201', '20260301'),
                        wpath=factors.wpath(stg_name), max_num=10, save=True, stg_name=stg_name)
 
     # 回测执行
