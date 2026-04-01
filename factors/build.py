@@ -9,4 +9,4 @@ import factor_builder
 factor_builder.build_change()
 factor_builder.build_market()
 factor_builder.build_industry_dummies_rm()
-factor_builder.build_factors(start='201001',end='202603')
+factor_builder.build_factors(start='201001',end='202604')

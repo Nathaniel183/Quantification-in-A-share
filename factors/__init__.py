@@ -4,7 +4,7 @@
 在软件包外，使用获取接口直接从记录的数据中获取
 """
 from .factor import (Factor, Change, Market, Industry,
-                    Size, Turnover, Value, Momentum, FScore, MScore,
+                    Size, Turnover, Value, Momentum, FScore, FScore_fix,MScore,
                      EP, BM, ROE, VOL, MAX, TO, ABTO, ILL, STR)
 
 import os
@@ -27,6 +27,7 @@ __all__ = ['wpath', # 获取权重文件路径
            'Value', # 价值因子
            'Momentum', # 动量因子
            'FScore', # 基本面因子
+           'FScore_fix', # 基本面因子，固定期数
            'MScore', # 造假因子
 
            'EP',    # 规模，净利润/总市值

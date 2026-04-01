@@ -150,11 +150,11 @@ class StgPred(Strategy):
 
 
 if __name__ == '__main__':
-    stg_name='pred_T_FS_ILL_ROE_ewma'
+    stg_name='pred_T_FSf'
 
     # 策略初始化
     strategy = StgPred(cash=10000000,
-                       datas=data_api.get_monthly('20200201', '20260301'),
+                       datas=data_api.get_monthly_hfq('20240401', '20260401'),
                        wpath=factors.wpath(stg_name), max_num=10, save=True, stg_name=stg_name)
 
     # 回测执行

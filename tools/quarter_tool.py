@@ -42,5 +42,28 @@ def current_quarter(date:str):
             break
     return y+d
 
+def fixed_quarter(date:str):
+    """
+    获取指定日期时按照约定应该获取的期数
+    :param date: 'YYYYMMDD' / 'YYYYMM'
+    :return: 期数str
+    """
+    choices = ['0331', '0630', '0930', '1231']
+    y = date[0:4]
+    m = date[4:6]
+    if m in ['01', '02', '03', '04']:
+        y = str(int(y)-1)
+        d = choices[2]
+    elif m in ['05', '06', '07', '08']:
+        d = choices[0]
+    elif m in ['09', '10']:
+        d = choices[1]
+    elif m in ['11', '12']:
+        d = choices[2]
+    return y + d
+
+
 if __name__ == '__main__':
-    print(current_quarter('202403'))
+    for m in range(1,13):
+        date = f"2025{m:02d}01"
+        print(f"{date}->{fixed_quarter(date)}")

@@ -179,6 +179,11 @@ class FScore(Factor):
     def __init__(self):
         super().__init__("F-Score", "N_T", extremum=0)
 
+class FScore_fix(Factor):
+    def __init__(self):
+        super().__init__("F-Score_fix", "N_T", extremum=0)
+
+
 class MScore(Factor):
     def __init__(self):
         super().__init__("M-Score", "N_T")
