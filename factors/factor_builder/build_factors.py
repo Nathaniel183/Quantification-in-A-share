@@ -43,17 +43,17 @@ def build_factors(start:str='200001', end:str='209912'):
     # _build_factor(_compute_EP,codes,start,end,'EP')
     # _build_factor(_compute_BM,codes,start,end,'BM')
 
+    _build_factor(_compute_fscore,codes,start,end,'F-Score')
     _build_factor(_compute_fscore_fixed,codes,start,end,'F-Score_fix')
+    _build_factor(_compute_turnover,codes,start,end,'turnover')
 
-    # fscore = _build_factor(_compute_fscore,codes,start,end,'F-Score')
-    # mscore = _build_factor(_compute_mscore,codes,start,end,'M-Score')
-    # size = _build_factor(_compute_size,codes,start,end,'size')
-    # value = _build_factor(_compute_value,codes,start,end,'value')
-    # turnover = _build_factor(_compute_turnover,codes,start,end,'turnover')
-    # mmt_n1 = _build_factor(_compute_momentum,codes,start,end,"momentum_n1_s0", n=1,skip=0)
-    # mmt_n3s0 = _build_factor(_compute_momentum,codes,start,end,"momentum_n3_s0", n=3,skip=0)
-    # mmt_n6s0 = _build_factor(_compute_momentum,codes,start,end,"momentum_n6_s0", n=6,skip=0)
-    # mmt_n12s1 = _build_factor(_compute_momentum,codes,start,end,"momentum_n12_s1", n=12,skip=1)
+    # _build_factor(_compute_mscore,codes,start,end,'M-Score')
+    # _build_factor(_compute_size,codes,start,end,'size')
+    # _build_factor(_compute_value,codes,start,end,'value')
+    # _build_factor(_compute_momentum,codes,start,end,"momentum_n1_s0", n=1,skip=0)
+    # _build_factor(_compute_momentum,codes,start,end,"momentum_n3_s0", n=3,skip=0)
+    # _build_factor(_compute_momentum,codes,start,end,"momentum_n6_s0", n=6,skip=0)
+    # _build_factor(_compute_momentum,codes,start,end,"momentum_n12_s1", n=12,skip=1)
 
 def _build_factor(
         compute_func,  # 计算函数

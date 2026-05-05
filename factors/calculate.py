@@ -17,12 +17,12 @@ vals1 = [
     # factors.Industry(),
     # factors.EP(),
     # factors.BM(),
-    # factors.ROE(),
+    factors.ROE(),
     # factors.VOL(),
     # factors.MAX(),
     # factors.TO(),
     # factors.ABTO(),
-    # factors.ILL(),
+    factors.ILL(),
     # factors.STR(),
 ]
 
@@ -49,7 +49,8 @@ lam_dict = {
 
 pred = factor_lab.revenue(vals1, 36, period_dict, method='mean', lam_dict=lam_dict)
 print(pred)
-pred.to_csv(factors.wpath('pred_T_FSf'))
+# pred.to_csv(factors.wpath('pred_T_FSf'))
+pred.to_csv(factors.wpath('pred_T_FSf_ILL_ROE'))
 
 
 # vals2 = [

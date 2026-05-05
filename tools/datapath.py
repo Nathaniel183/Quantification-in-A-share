@@ -9,7 +9,7 @@ data_path = "D:/Projects/PythonProject/A-share_database/"
 
 stock_path = data_path + "股票列表.csv"
 index_path = data_path + "指数列表.csv"
-name_path = data_path + "name.csv"
+name_path = data_path + "财务数据/name.csv"
 st_path = data_path + "退市股票列表.csv"
 con_daily_index_path = data_path + "每日指标.csv"
 limit_path = data_path + "limit.csv"
