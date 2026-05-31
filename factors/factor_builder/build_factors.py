@@ -34,12 +34,12 @@ def build_factors(start:str='200001', end:str='209912'):
     codes = data_api.get_stock_list()['股票代码']
     print(codes)
 
-    # _build_factor(_compute_ROE,codes,start,end,'ROE')
+    _build_factor(_compute_ROE,codes,start,end,'ROE')
     # _build_factor(_compute_TO,codes,start,end,'TO')
     # _build_factor(_compute_ABTO,codes,start,end,'ABTO')
     # _build_factor(_compute_VOL,codes,start,end,'VOL')
     # _build_factor(_compute_MAX,codes,start,end,'MAX')
-    # _build_factor(_compute_ILL,codes,start,end,'ILL')
+    _build_factor(_compute_ILL,codes,start,end,'ILL')
     # _build_factor(_compute_EP,codes,start,end,'EP')
     # _build_factor(_compute_BM,codes,start,end,'BM')
 

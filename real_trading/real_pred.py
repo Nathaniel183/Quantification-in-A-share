@@ -5,8 +5,8 @@ import pandas as pd
 import data_api
 import factors
 
-date = '202605'
-stg_name='pred_T_FS'
+date = '202606'
+stg_name='pred_T_FSf'
 stg_name='pred_T_FSf_ILL_ROE'
 
 ret = pd.read_csv(factors.wpath(stg_name), dtype={'code':str, 'date':str}).rename(columns={'code':'股票代码'})
